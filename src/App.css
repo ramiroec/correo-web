@@ -1,79 +1,321 @@
-body {
-  font-family: 'Segoe UI', Arial, sans-serif;
-  background: #f7f7f7;
+/* Variables de tema claro */
+.light {
+  --bg: #ffffff;
+  --bg-secondary: #f8fafc;
+  --text: #1f2937;
+  --text-secondary: #6b7280;
+  --border: #e5e7eb;
+  --primary: #3b82f6;
+  --success: #10b981;
+  --danger: #ef4444;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Variables de tema oscuro */
+.dark {
+  --bg: #1f2937;
+  --bg-secondary: #111827;
+  --text: #f9fafb;
+  --text-secondary: #d1d5db;
+  --border: #374151;
+  --primary: #60a5fa;
+  --success: #34d399;
+  --danger: #f87171;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Reset básico */
+* {
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
 }
 
-div {
-  max-width: 500px;
-  margin: 40px auto;
-  background: #fff;
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.6;
+}
+
+/* Contenedor principal */
+.app {
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  transition: all 0.3s ease;
+}
+
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.header h1 {
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+.theme-toggle {
+  background: none;
+  border: 1px solid var(--border);
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  padding: 32px 24px;
-}
-
-h2 {
-  text-align: center;
-  margin-bottom: 24px;
-  color: #333;
-}
-
-input {
   padding: 8px 12px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  margin-right: 8px;
-  font-size: 16px;
-}
-
-button {
-  padding: 7px 14px;
-  border: none;
-  border-radius: 4px;
-  background: #1976d2;
-  color: #fff;
-  font-size: 15px;
+  font-size: 1.2rem;
   cursor: pointer;
-  margin-right: 4px;
-  transition: background 0.2s;
+  transition: all 0.2s;
+  background: var(--bg-secondary);
 }
 
-button:hover {
-  background: #1565c0;
+.theme-toggle:hover {
+  transform: scale(1.05);
 }
 
-ul {
-  list-style: none;
-  padding: 0;
+/* Sección agregar */
+.add-section {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 30px;
+}
+
+/* Input */
+.input {
+  flex: 1;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.input::placeholder {
+  color: var(--text-secondary);
+}
+
+/* Botones */
+.btn {
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-secondary);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.9rem;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow);
+}
+
+.btn.primary {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.btn.success {
+  background: var(--success);
+  color: white;
+  border-color: var(--success);
+}
+
+.btn.danger {
+  background: var(--danger);
+  color: white;
+  border-color: var(--danger);
+}
+
+/* Estado vacío */
+.empty {
+  text-align: center;
+  padding: 60px 20px;
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  color: var(--text-secondary);
+}
+
+/* Lista de correos */
+.emails {
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.email-item {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.email-item:last-child {
+  border-bottom: none;
+}
+
+.view-mode,
+.edit-mode {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+}
+
+.edit-mode .input {
+  flex: 1;
+  margin: 0;
+}
+
+.email {
+  font-size: 1rem;
+  color: var(--text);
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.actions .btn {
+  padding: 8px 10px;
+  min-width: 36px;
+}
+
+/* Formulario de envío */
+.form-section {
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  padding: 24px;
+}
+
+.input-group {
+  margin-bottom: 20px;
+}
+
+.label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+  color: var(--text);
+  font-size: 0.9rem;
+}
+
+.textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 1rem;
+  font-family: inherit;
+  resize: vertical;
+  transition: border-color 0.2s;
+  min-height: 120px;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.textarea::placeholder {
+  color: var(--text-secondary);
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
   margin-top: 24px;
 }
 
-li {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: #f1f1f1;
-  margin-bottom: 10px;
-  padding: 10px 12px;
-  border-radius: 5px;
+.btn.secondary {
+  background: var(--bg);
+  color: var(--text-secondary);
+  border-color: var(--border);
 }
 
-li input {
-  margin-right: 8px;
-  flex: 1;
+.btn.secondary:hover {
+  background: var(--bg-secondary);
+  color: var(--text);
 }
 
-li button {
-  margin-left: 4px;
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
 }
 
-@media (max-width: 600px) {
-  div {
-    padding: 16px 8px;
+/* Mensajes */
+.message {
+  margin-top: 16px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.message.success {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--success);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.message.error {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--danger);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .container {
+    padding: 15px;
   }
-  input, button {
-    font-size: 14px;
+  
+  .header h1 {
+    font-size: 1.5rem;
+  }
+  
+  .add-section {
+    flex-direction: column;
+  }
+  
+  .view-mode,
+  .edit-mode {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .actions {
+    align-self: flex-end;
+  }
+  
+  .form-section {
+    padding: 20px;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .textarea {
+    min-height: 100px;
   }
 }
