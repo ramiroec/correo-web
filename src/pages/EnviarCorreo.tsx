@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import api from '../api';
-import { Editor } from '@tinymce/tinymce-react'; // <-- Importa TinyMCE
+import { Editor } from '@tinymce/tinymce-react';
 
 function EnviarCorreo() {
   const [asunto, setAsunto] = useState('');
@@ -11,20 +11,24 @@ function EnviarCorreo() {
 
   const enviar = async () => {
     if (!asunto.trim() || !cuerpo.trim()) return;
-    
+
     setEnviando(true);
+    console.log('📨 Enviando correo:', { asunto, cuerpo });
     try {
       const res = await api.post('/enviar', { asunto, cuerpo });
+      console.log('✅ Respuesta del backend:', res.data);
       setMensaje(res.data);
       setAsunto('');
       setCuerpo('');
     } catch (err) {
+      console.error('❌ Error al enviar el correo:', err);
       setMensaje('Error al enviar el correo');
     }
     setEnviando(false);
   };
 
   const limpiarFormulario = () => {
+    console.log('🧹 Limpiando formulario');
     setAsunto('');
     setCuerpo('');
     setMensaje('');
@@ -37,7 +41,10 @@ function EnviarCorreo() {
           <h1>Enviar Correo Masivo</h1>
           <button 
             className="theme-toggle"
-            onClick={() => setDarkMode(!darkMode)}
+            onClick={() => {
+              console.log('🌗 Cambiando modo:', !darkMode ? 'dark' : 'light');
+              setDarkMode(!darkMode);
+            }}
           >
             {darkMode ? '☀️' : '🌙'}
           </button>
@@ -49,7 +56,10 @@ function EnviarCorreo() {
             <input
               className="input"
               value={asunto}
-              onChange={(e) => setAsunto(e.target.value)}
+              onChange={(e) => {
+                console.log('✏️ Asunto cambiado:', e.target.value);
+                setAsunto(e.target.value);
+              }}
               placeholder="Escribe el asunto del correo..."
               disabled={enviando}
             />
@@ -60,7 +70,10 @@ function EnviarCorreo() {
             <Editor
               apiKey="4dj9zhqglh1bt4sfa92pnu66ex6awqkvysfn4satap0jqxvz"
               value={cuerpo}
-              onEditorChange={(content) => setCuerpo(content)}
+              onEditorChange={(content) => {
+                console.log('📝 Contenido del editor cambiado:', content);
+                setCuerpo(content);
+              }}
               init={{
                 height: 300,
                 menubar: false,
@@ -68,12 +81,28 @@ function EnviarCorreo() {
                   'advlist autolink lists link charmap preview anchor',
                   'searchreplace visualblocks code fullscreen',
                   'insertdatetime media table paste code help wordcount',
-                  'image' // <-- Agrega el plugin de imagen
+                  'image'
                 ],
                 toolbar:
-                  'undo redo | formatselect | bold italic backcolor | image | ' + // <-- Agrega el botón de imagen
+                  'undo redo | formatselect | bold italic backcolor | image | ' +
                   'alignleft aligncenter alignright alignjustify | ' +
-                  'bullist numlist outdent indent | removeformat | help'
+                  'bullist numlist outdent indent | removeformat | help',
+                images_upload_handler: async (blobInfo: any) => {
+                  console.log('📤 Subiendo imagen:', blobInfo.filename());
+                  const formData = new FormData();
+                  formData.append('image', blobInfo.blob(), blobInfo.filename());
+                  const res = await api.post('/upload', formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                  });
+                  const data = res.data;
+                  if (data.location) {
+                    console.log('✅ Imagen subida, respuesta:', data);
+                    return data.location;
+                  } else {
+                    console.error('❌ Respuesta inválida:', data);
+                    throw new Error('Respuesta del servidor inválida: falta location');
+                  }
+                }
               }}
               disabled={enviando}
             />
