@@ -8,6 +8,8 @@ function ListaCorreos() {
   const [editId, setEditId] = useState<number | null>(null);
   const [editEmail, setEditEmail] = useState('');
   const [darkMode, setDarkMode] = useState(false);
+  const [importText, setImportText] = useState('');
+  const [showImportArea, setShowImportArea] = useState(false);
 
   const cargarCorreos = async () => {
     const res = await api.get('/correos');
@@ -50,6 +52,38 @@ function ListaCorreos() {
     setEditEmail('');
   };
 
+  // Función para extraer correos del texto
+  const extraerCorreos = (texto: string): string[] => {
+    const regex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
+    return texto.match(regex) || [];
+  };
+
+  // Función para importar correos
+  const importarCorreos = async () => {
+    const correosExtraidos = extraerCorreos(importText);
+    
+    if (correosExtraidos.length === 0) {
+      alert('No se encontraron direcciones de correo en el texto');
+      return;
+    }
+
+    try {
+      // Podrías optimizar esto para enviar todos los correos en una sola petición
+      // dependiendo de cómo esté configurado tu backend
+      for (const email of correosExtraidos) {
+        await api.post('/agregar', { email });
+      }
+      
+      setImportText('');
+      setShowImportArea(false);
+      cargarCorreos();
+      alert(`Se importaron ${correosExtraidos.length} correos electrónicos`);
+    } catch (error) {
+      console.error('Error al importar correos:', error);
+      alert('Ocurrió un error al importar los correos');
+    }
+  };
+
   return (
     <div className={`app ${darkMode ? 'dark' : 'light'}`}>
       <div className="container">
@@ -74,7 +108,42 @@ function ListaCorreos() {
           <button className="btn primary" onClick={agregarCorreo}>
             Agregar
           </button>
+          <button 
+            className="btn secondary" 
+            onClick={() => setShowImportArea(!showImportArea)}
+          >
+            {showImportArea ? 'Cancelar' : 'Importar correos'}
+          </button>
         </div>
+
+        {showImportArea && (
+          <div className="import-section">
+            <textarea
+              className="textarea"
+              value={importText}
+              onChange={(e) => setImportText(e.target.value)}
+              placeholder="Pega aquí un texto que contenga direcciones de correo electrónico..."
+              rows={5}
+            />
+            <div className="import-actions">
+              <button className="btn primary" onClick={importarCorreos}>
+                Importar correos
+              </button>
+              <button 
+                className="btn" 
+                onClick={() => {
+                  setImportText('');
+                  setShowImportArea(false);
+                }}
+              >
+                Cancelar
+              </button>
+            </div>
+            <p className="hint">
+              Se detectarán automáticamente todas las direcciones de correo electrónico en el texto.
+            </p>
+          </div>
+        )}
 
         {correos.length === 0 ? (
           <div className="empty">
