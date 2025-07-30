@@ -11,6 +11,7 @@ function ListaCorreos() {
   const [importText, setImportText] = useState('');
   const [showImportArea, setShowImportArea] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [importando, setImportando] = useState(false);
 
   const cargarCorreos = async () => {
     setLoading(true);
@@ -63,20 +64,19 @@ function ListaCorreos() {
 
   // Función para importar correos
   const importarCorreos = async () => {
+    setImportando(true);
     const correosExtraidos = extraerCorreos(importText);
-    
+
     if (correosExtraidos.length === 0) {
       alert('No se encontraron direcciones de correo en el texto');
+      setImportando(false);
       return;
     }
 
     try {
-      // Podrías optimizar esto para enviar todos los correos en una sola petición
-      // dependiendo de cómo esté configurado tu backend
       for (const email of correosExtraidos) {
         await api.post('/agregar', { email });
       }
-      
       setImportText('');
       setShowImportArea(false);
       cargarCorreos();
@@ -85,6 +85,7 @@ function ListaCorreos() {
       console.error('Error al importar correos:', error);
       alert('Ocurrió un error al importar los correos');
     }
+    setImportando(false);
   };
 
   return (
@@ -129,8 +130,15 @@ function ListaCorreos() {
               rows={5}
             />
             <div className="import-actions">
-              <button className="btn primary" onClick={importarCorreos}>
-                Importar correos
+              <button
+                className="btn primary"
+                onClick={importarCorreos}
+                disabled={importando}
+              >
+                {importando ? (
+                  <span className="spinner" style={{ marginRight: 8 }}></span>
+                ) : null}
+                {importando ? 'Importando...' : 'Importar correos'}
               </button>
               <button 
                 className="btn" 

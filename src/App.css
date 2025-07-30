@@ -286,6 +286,23 @@ body {
   border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
+/* Spinner */
+.spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  border-top: 3px solid var(--primary, #3498db);
+  animation: spin 1s linear infinite;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg);}
+  100% { transform: rotate(360deg);}
+}
+
 /* Responsive */
 @media (max-width: 640px) {
   .container {
