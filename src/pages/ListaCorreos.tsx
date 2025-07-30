@@ -10,10 +10,13 @@ function ListaCorreos() {
   const [darkMode, setDarkMode] = useState(false);
   const [importText, setImportText] = useState('');
   const [showImportArea, setShowImportArea] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const cargarCorreos = async () => {
+    setLoading(true);
     const res = await api.get('/correos');
     setCorreos(res.data);
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -145,7 +148,11 @@ function ListaCorreos() {
           </div>
         )}
 
-        {correos.length === 0 ? (
+        {loading ? (
+          <div className="loading">
+            <p>Cargando correos...</p>
+          </div>
+        ) : correos.length === 0 ? (
           <div className="empty">
             <p>No hay correos registrados</p>
           </div>
