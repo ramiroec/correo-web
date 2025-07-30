@@ -11,6 +11,7 @@ function ListaCorreos() {
   const [importText, setImportText] = useState('');
   const [showImportArea, setShowImportArea] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [seleccionados, setSeleccionados] = useState<number[]>([]);
 
   const cargarCorreos = async () => {
     setLoading(true);
@@ -87,6 +88,24 @@ function ListaCorreos() {
     }
   };
 
+  // Función para manejar selección
+  const toggleSeleccion = (id: number) => {
+    setSeleccionados((prev) =>
+      prev.includes(id) ? prev.filter((sid) => sid !== id) : [...prev, id]
+    );
+  };
+
+  // Eliminar seleccionados
+  const eliminarSeleccionados = async () => {
+    if (seleccionados.length === 0) return;
+    if (!window.confirm(`¿Eliminar ${seleccionados.length} correos seleccionados?`)) return;
+    for (const id of seleccionados) {
+      await api.delete(`/correos/${id}`);
+    }
+    setSeleccionados([]);
+    cargarCorreos();
+  };
+
   return (
     <div className={`app ${darkMode ? 'dark' : 'light'}`}>
       <div className="container">
@@ -157,42 +176,59 @@ function ListaCorreos() {
             <p>No hay correos registrados</p>
           </div>
         ) : (
-          <div className="emails">
-            {correos.map((correo) => (
-              <div key={correo.id} className="email-item">
-                {editId === correo.id ? (
-                  <div className="edit-mode">
-                    <input
-                      className="input"
-                      value={editEmail}
-                      onChange={(e) => setEditEmail(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && guardarEdicion(correo.id)}
-                    />
-                    <div className="actions">
-                      <button className="btn success" onClick={() => guardarEdicion(correo.id)}>
-                        ✓
-                      </button>
-                      <button className="btn" onClick={cancelarEdicion}>
-                        ✕
-                      </button>
+          <>
+            {correos.length > 0 && (
+              <button
+                className="btn danger"
+                disabled={seleccionados.length === 0}
+                onClick={eliminarSeleccionados}
+                style={{ marginBottom: 12 }}
+              >
+                Eliminar seleccionados ({seleccionados.length})
+              </button>
+            )}
+
+            <div className="emails">
+              {correos.map((correo) => (
+                <div key={correo.id} className="email-item">
+                  <input
+                    type="checkbox"
+                    checked={seleccionados.includes(correo.id)}
+                    onChange={() => toggleSeleccion(correo.id)}
+                    style={{ marginRight: 8 }}
+                  />
+                  {editId === correo.id ? (
+                    <div className="edit-mode">
+                      <input
+                        className="input"
+                        value={editEmail}
+                        onChange={(e) => setEditEmail(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && guardarEdicion(correo.id)}
+                      />
+                      <div className="actions">
+                        <button className="btn success" onClick={() => guardarEdicion(correo.id)}>
+                          ✓
+                        </button>
+                        <button className="btn" onClick={cancelarEdicion}>
+                          ✕
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ) : (
-                  <div className="view-mode">
-                    <span className="email">{correo.email}</span>
-                    <div className="actions">
-                      <button className="btn" onClick={() => iniciarEdicion(correo)}>
-                        ✏️
-                      </button>
-                      <button className="btn danger" onClick={() => eliminarCorreo(correo.id)}>
-                        🗑️
-                      </button>
+                  ) : (
+                    <div className="view-mode">
+                      <span className="email">{correo.email}</span>
+                      <div className="actions">
+                        <button className="btn" onClick={() => iniciarEdicion(correo)}>
+                          ✏️
+                        </button>
+                        {/* Eliminar individual puede mantenerse o quitarse */}
+                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </div>
     </div>
