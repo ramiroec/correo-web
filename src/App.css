@@ -45,7 +45,7 @@ body {
 }
 
 .container {
-  max-width: 600px;
+  max-width: 900px;
   margin: 0 auto;
   padding: 20px;
 }
@@ -284,92 +284,6 @@ body {
   background: rgba(239, 68, 68, 0.1);
   color: var(--danger);
   border: 1px solid rgba(239, 68, 68, 0.3);
-}
-
-/* Estilos para la sección de progreso */
-.progress-section {
-  margin: 20px 0;
-  padding: 15px;
-  background-color: var(--bg-secondary);
-  border-radius: 8px;
-}
-
-.progress-info {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 10px;
-  font-size: 14px;
-  color: var(--text-secondary);
-}
-
-.progress-bar-container {
-  height: 10px;
-  background-color: var(--bg-tertiary);
-  border-radius: 5px;
-  overflow: hidden;
-}
-
-.progress-bar {
-  height: 100%;
-  background-color: var(--primary);
-  transition: width 0.3s ease;
-}
-
-/* Estilos para la consola de logs */
-.logs-container {
-  margin: 20px 0;
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.logs-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 15px;
-  background-color: var(--bg-secondary);
-  border-bottom: 1px solid var(--border-color);
-}
-
-.logs-content {
-  max-height: 200px;
-  overflow-y: auto;
-  padding: 10px;
-  background-color: var(--bg-primary);
-  font-family: monospace;
-  font-size: 13px;
-}
-
-.log-entry {
-  padding: 5px 0;
-  border-bottom: 1px dashed var(--border-color);
-}
-
-.log-entry:last-child {
-  border-bottom: none;
-}
-
-.log-empty {
-  color: var(--text-secondary);
-  text-align: center;
-  padding: 20px;
-}
-
-/* Spinner para el botón de enviar */
-.spinner {
-  display: inline-block;
-  width: 12px;
-  height: 12px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
-  border-top-color: white;
-  animation: spin 1s ease-in-out infinite;
-  margin-right: 8px;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
 }
 
 /* Responsive */

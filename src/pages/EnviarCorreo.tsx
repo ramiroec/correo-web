@@ -1,97 +1,37 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import api from '../api';
 import { Editor } from '@tinymce/tinymce-react';
 
-interface ProgressState {
-  current: number;
-  total: number;
-  batch: number;
-}
-
-interface BlobInfo {
-  filename: () => string;
-  blob: () => Blob;
-}
-
 function EnviarCorreo() {
-  const [asunto, setAsunto] = useState<string>('');
-  const [cuerpo, setCuerpo] = useState<string>('');
-  const [mensaje, setMensaje] = useState<string>('');
-  const [enviando, setEnviando] = useState<boolean>(false);
-  const [darkMode, setDarkMode] = useState<boolean>(false);
-  const [progress, setProgress] = useState<ProgressState>({ 
-    current: 0, 
-    total: 0, 
-    batch: 0 
-  });
-  const [logs, setLogs] = useState<string[]>([]);
-  const logsEndRef = useRef<HTMLDivElement>(null);
-
-  const addLog = (message: string) => {
-    const timestamp = new Date().toLocaleTimeString();
-    setLogs(prev => [...prev, `${timestamp}: ${message}`]);
-  };
-
-  // Auto-scroll para los logs
-  useEffect(() => {
-    logsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [logs]);
+  const [asunto, setAsunto] = useState('');
+  const [cuerpo, setCuerpo] = useState('');
+  const [mensaje, setMensaje] = useState('');
+  const [enviando, setEnviando] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
 
   const enviar = async () => {
     if (!asunto.trim() || !cuerpo.trim()) return;
 
     setEnviando(true);
-    setProgress({ current: 0, total: 0, batch: 0 });
-    setLogs([]);
-    addLog('Iniciando envío masivo...');
-    
+    console.log('📨 Enviando correo:', { asunto, cuerpo });
     try {
-      // Primero obtenemos el total de correos
-      const countRes = await api.get<{ count: number }>('/correos/count');
-      const totalEmails = countRes.data.count;
-      addLog(`Total de destinatarios: ${totalEmails}`);
-      setProgress(prev => ({ ...prev, total: totalEmails }));
-
-      // Luego iniciamos el envío
-      const res = await api.post('/enviar', { 
-        asunto, 
-        cuerpo 
-      }, {
-        onUploadProgress: (progressEvent) => {
-          if (progressEvent.progress) {
-            const current = Math.round(progressEvent.progress * totalEmails);
-            setProgress(prev => ({ 
-              ...prev, 
-              current: Math.min(current, totalEmails),
-              batch: Math.floor(current / 50) + 1
-            }));
-          }
-        }
-      });
-
-      addLog('Envío completado con éxito');
+      const res = await api.post('/enviar', { asunto, cuerpo });
+      console.log('✅ Respuesta del backend:', res.data);
       setMensaje(res.data);
       setAsunto('');
       setCuerpo('');
-    } catch (err: unknown) {
-      let errorMessage = 'Error desconocido';
-      if (err instanceof Error) {
-        errorMessage = err.message;
-      }
-      addLog(`Error: ${errorMessage}`);
+    } catch (err) {
       console.error('❌ Error al enviar el correo:', err);
       setMensaje('Error al enviar el correo');
-    } finally {
-      setEnviando(false);
     }
+    setEnviando(false);
   };
 
   const limpiarFormulario = () => {
-    addLog('Limpiando formulario');
+    console.log('🧹 Limpiando formulario');
     setAsunto('');
     setCuerpo('');
     setMensaje('');
-    setLogs([]);
   };
 
   return (
@@ -102,7 +42,7 @@ function EnviarCorreo() {
           <button 
             className="theme-toggle"
             onClick={() => {
-              addLog(`Cambiando a modo ${!darkMode ? 'oscuro' : 'claro'}`);
+              console.log('🌗 Cambiando modo:', !darkMode ? 'dark' : 'light');
               setDarkMode(!darkMode);
             }}
           >
@@ -117,8 +57,8 @@ function EnviarCorreo() {
               className="input"
               value={asunto}
               onChange={(e) => {
+                console.log('✏️ Asunto cambiado:', e.target.value);
                 setAsunto(e.target.value);
-                addLog(`Asunto actualizado: ${e.target.value.substring(0, 20)}...`);
               }}
               placeholder="Escribe el asunto del correo..."
               disabled={enviando}
@@ -130,9 +70,9 @@ function EnviarCorreo() {
             <Editor
               apiKey="4dj9zhqglh1bt4sfa92pnu66ex6awqkvysfn4satap0jqxvz"
               value={cuerpo}
-              onEditorChange={(content: string) => {
+              onEditorChange={(content) => {
+                console.log('📝 Contenido del editor cambiado:', content);
                 setCuerpo(content);
-                addLog(`Cuerpo del mensaje actualizado (${content.length} caracteres)`);
               }}
               init={{
                 height: 300,
@@ -147,70 +87,25 @@ function EnviarCorreo() {
                   'undo redo | formatselect | bold italic backcolor | image | ' +
                   'alignleft aligncenter alignright alignjustify | ' +
                   'bullist numlist outdent indent | removeformat | help',
-                images_upload_handler: async (blobInfo: BlobInfo) => {
-                  addLog(`Subiendo imagen: ${blobInfo.filename()}`);
+                images_upload_handler: async (blobInfo: any) => {
+                  console.log('📤 Subiendo imagen:', blobInfo.filename());
                   const formData = new FormData();
                   formData.append('image', blobInfo.blob(), blobInfo.filename());
-                  try {
-                    const res = await api.post<{ location: string }>('/upload', formData, {
-                      headers: { 'Content-Type': 'multipart/form-data' }
-                    });
-                    addLog(`Imagen subida correctamente`);
-                    return res.data.location;
-                  } catch (err: unknown) {
-                    let errorMessage = 'Error desconocido al subir imagen';
-                    if (err instanceof Error) {
-                      errorMessage = err.message;
-                    }
-                    addLog(`Error al subir imagen: ${errorMessage}`);
-                    throw err;
+                  const res = await api.post('/upload', formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                  });
+                  const data = res.data;
+                  if (data.location) {
+                    console.log('✅ Imagen subida, respuesta:', data);
+                    return data.location;
+                  } else {
+                    console.error('❌ Respuesta inválida:', data);
+                    throw new Error('Respuesta del servidor inválida: falta location');
                   }
                 }
               }}
               disabled={enviando}
             />
-          </div>
-
-          {/* Sección de progreso */}
-          {enviando && (
-            <div className="progress-section">
-              <div className="progress-info">
-                <span>Progreso: {progress.current} de {progress.total}</span>
-                <span>Lote actual: {progress.batch}</span>
-              </div>
-              <div className="progress-bar-container">
-                <div 
-                  className="progress-bar" 
-                  style={{ 
-                    width: `${progress.total > 0 ? (progress.current / progress.total) * 100 : 0}%` 
-                  }}
-                ></div>
-              </div>
-            </div>
-          )}
-
-          {/* Consola de logs */}
-          <div className="logs-container">
-            <div className="logs-header">
-              <h3>Registro de actividad</h3>
-              <button 
-                onClick={() => setLogs([])} 
-                className="btn small"
-                disabled={logs.length === 0}
-              >
-                Limpiar
-              </button>
-            </div>
-            <div className="logs-content">
-              {logs.length === 0 ? (
-                <div className="log-empty">No hay actividad registrada</div>
-              ) : (
-                logs.map((log, index) => (
-                  <div key={index} className="log-entry">{log}</div>
-                ))
-              )}
-              <div ref={logsEndRef} />
-            </div>
           </div>
 
           <div className="form-actions">
@@ -226,12 +121,7 @@ function EnviarCorreo() {
               onClick={enviar}
               disabled={!asunto.trim() || !cuerpo.trim() || enviando}
             >
-              {enviando ? (
-                <>
-                  <span className="spinner"></span>
-                  Enviando...
-                </>
-              ) : 'Enviar Correo'}
+              {enviando ? 'Enviando...' : 'Enviar Correo'}
             </button>
           </div>
 
