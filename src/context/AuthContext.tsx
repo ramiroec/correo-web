@@ -15,7 +15,7 @@ export const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
 
   const login = async (user: string, pass: string) => {
     // credenciales fijas solicitadas
-    if (user === 'diazgill' && pass === 'diazgill') {
+    if (user === 'fullstack' && pass === 'fullstack') {
       setIsAuthenticated(true)
       localStorage.setItem('auth', '1')
       return true
