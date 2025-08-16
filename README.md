@@ -10,10 +10,6 @@ Aplicación web para gestionar y enviar campañas de correo electrónico de form
 - Autenticación de usuarios.
 - Interfaz moderna y responsiva.
 
-## 🖥️ Vista previa
-
-![Dashboard](https://user-images.githubusercontent.com/your-demo-image.png) <!-- Puedes agregar una captura de pantalla aquí -->
-
 ## 📦 Instalación
 
 1. Clona el repositorio:
